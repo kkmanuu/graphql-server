@@ -1,30 +1,48 @@
-const { ApolloServer } = require("@apollo/server")
-const { startStandaloneServer } = require("@apollo/server/standalone")
-// definde schema
+const { ApolloServer } = require("@apollo/server");
+const { startStandaloneServer } = require("@apollo/server/standalone");
+
+// 1. Define schema
 const typeDefs = `
+  type User {
+    id: ID!
+    name: String!
+    age: Int!
+  }
+
   type Query {
-    hello: String
+    users: [User]
+    user(id: ID!): User
   }
 `;
 
-// Deefine resolvers
+// 2. Fake Database
+const users = [
+  { id: "1", name: "Emmanuel", age: 25 },
+  { id: "2", name: "Alice", age: 22 },
+  { id: "3", name: "Bob", age: 30 },
+];
+
+// 3. Define resolvers
 const resolvers = {
   Query: {
-    hello: () => "Hello, world! This is a simple GraphQL server."
-  }
+    users: () => users,
+    user: (_, args) => {
+      return users.find(user => user.id === args.id);
+    },
+  },
 };
 
-// create server
+// 4. Create server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
 
-// start server
+// 5. Start server
 startStandaloneServer(server, {
   listen: { port: 4000 },
 }).then(({ url }) => {
-  console.log(`Server ready at ${url}`);
+  console.log(`🚀 Server ready at ${url}`);
 }).catch((err) => {
   console.error("Error starting server:", err);
 });
