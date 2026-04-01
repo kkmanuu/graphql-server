@@ -13,6 +13,9 @@ const typeDefs = `
     users: [User]
     user(id: ID!): User
   }
+  type Mutation {
+    createUser(name: String!, age: Int!): User
+  }
 `;
 
 // 2. Fake Database
@@ -28,6 +31,20 @@ const resolvers = {
     users: () => users,
     user: (_, args) => {
       return users.find(user => user.id === args.id);
+    },
+  },
+
+  // Resolvers for mutations
+
+   Mutation:{
+    createUser: (_, args) => {
+      const newUser = {
+        id: String(users.length + 1),
+        name: args.name,
+        age: args.age,
+      };
+      users.push(newUser);
+      return newUser;
     },
   },
 };
