@@ -13,8 +13,11 @@ const typeDefs = `
     users: [User]
     user(id: ID!): User
   }
+
   type Mutation {
     createUser(name: String!, age: Int!): User
+    updateUser(id: ID!, name: String, age: Int): User
+    deleteUser(id: ID!): String
   }
 `;
 
@@ -34,9 +37,7 @@ const resolvers = {
     },
   },
 
-  // Resolvers for mutations
-
-   Mutation:{
+  Mutation: {
     createUser: (_, args) => {
       const newUser = {
         id: String(users.length + 1),
@@ -45,6 +46,24 @@ const resolvers = {
       };
       users.push(newUser);
       return newUser;
+    },
+
+    updateUser: (_, args) => {
+      const user = users.find(user => user.id === args.id);
+      if (!user) throw new Error("User not found");
+
+      user.name = args.name ?? user.name;
+      user.age = args.age ?? user.age;
+
+      return user;
+    },
+
+    deleteUser: (_, args) => {
+      const index = users.findIndex(user => user.id === args.id);
+      if (index === -1) throw new Error("User not found");
+
+      users.splice(index, 1);
+      return "User deleted successfully";
     },
   },
 };
